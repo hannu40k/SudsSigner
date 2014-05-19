@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from __future__ import with_statement
-import StringIO
 from suds.plugin import MessagePlugin
 from lxml import etree
 from suds.bindings.binding import envns
@@ -91,10 +90,10 @@ class SignerPlugin(MessagePlugin):
         queue.push_and_mark(body)
         security = ensure_security_header(env, queue)
         btkn = etree.SubElement(security, WSSE_BST, {
-                'EncodingType': B64ENC,
-                'ValueType': X509PROFILE,
-                WSU_ID: CERTREF,
-            }, NSMAP)
+            'EncodingType': B64ENC,
+            'ValueType': X509PROFILE,
+            WSU_ID: CERTREF,
+        }, NSMAP)
         crt = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert)
         crt = crt.replace('\n', '').replace(BEGINCERT, '').replace(ENDCERT, '')
         btkn.text = crt
@@ -126,8 +125,18 @@ class SignerPlugin(MessagePlugin):
                 ns_id('X509IssuerSerial', dsns))
         x509_issuer_name = etree.SubElement(x509_issuer_serial,
                 ns_id('X509IssuerName', dsns))
-        x509_issuer_name.text = ', '.join(
+        issuer = ', '.join(
                 '='.join(c) for c in self.cert.get_issuer().get_components())
+        try:
+            issuer = unicode(issuer, 'utf-8')
+        except UnicodeDecodeError:
+            try:
+                issuer = unicode(issuer, 'latin1')
+            except UnicodeDecodeError:
+                raise ValueError(
+                    "The certificate issuer has a name with "
+                    "name illegal character encoding.")
+        x509_issuer_name.text = issuer
         x509_serial_number = etree.SubElement(x509_issuer_serial,
                 ns_id('X509SerialNumber', dsns))
         x509_serial_number.text = str(self.cert.get_serial_number())
