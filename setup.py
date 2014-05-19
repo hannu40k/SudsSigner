@@ -14,7 +14,7 @@ from setuptools import setup
 
 
 setup(name='sudssigner',
-      version='0.9',
+      version='0.9.1',
       packages=['sudssigner'],
       install_requires=[
         'lxml', 'pyopenssl', 'suds>=0.4.1',
