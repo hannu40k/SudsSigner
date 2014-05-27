@@ -11,10 +11,11 @@
 # Tested with virtualenv --distribute and python 2.7 on Ubuntu 12.04
 # after copying libxml2 manually from system folder.
 from setuptools import setup
+import sudssigner
 
 
 setup(name='sudssigner',
-      version='0.9.1',
+      version=sudssigner.__version__,
       packages=['sudssigner'],
       install_requires=[
         'lxml', 'pyopenssl', 'suds>=0.4.1',
