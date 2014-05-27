@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from __future__ import with_statement
+import logging
 from suds.plugin import MessagePlugin
 from lxml import etree
 from suds.bindings.binding import envns
@@ -12,6 +12,8 @@ from OpenSSL import crypto
 from uuid import uuid4
 
 import xmlsec
+
+log = logging.getLogger(__name__)
 
 
 def lxml_ns(suds_ns):
@@ -44,6 +46,21 @@ DS_SIGNATURE = ns_id('Signature', dsns)
 
 
 class SignerPlugin(MessagePlugin):
+    """
+    Digital signature plugin for suds >= 0.4.1
+    This plugins uses suds plugin "sending" hook to add
+    a XML digital signature for the SOAP:Body tag.
+    Arguments:
+    - keyfile: RSA/DSA key filename + certificate in PEM format
+    - keytype: DSA or RSA. Tries to detect key type
+    - pwd: password for encrypted key
+    - pwdCallback: callable that returns password
+    - pwdCallbackCtx: arguments sent to the pwdCallback callable
+
+    To debug the XML returned, do:
+    import logging
+    logging.getLogger('sudssigner.plugin').setLevel(logging.DEBUG)
+    """
     def __init__(self, keyfile, keytype=None, pwd=None, pwdCallback=None,
             pwdCallbackCtx=None):
         init_xmlsec()
@@ -98,7 +115,9 @@ class SignerPlugin(MessagePlugin):
         crt = crt.replace('\n', '').replace(BEGINCERT, '').replace(ENDCERT, '')
         btkn.text = crt
         self.insert_signature_template(security, queue)
-        context.envelope = self.get_signature(etree.tostring(env))
+        text = self.get_signature(etree.tostring(env))
+        log.debug("WS call text after signature:\n%s", text)
+        context.envelope = text
 
     def insert_signature_template(self, security, queue):
         signature = etree.SubElement(security, DS_SIGNATURE)
