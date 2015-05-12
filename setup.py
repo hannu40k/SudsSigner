@@ -13,12 +13,30 @@
 from setuptools import setup
 import sudssigner
 
-
-setup(name='sudssigner',
-      version=sudssigner.__version__,
-      packages=['sudssigner'],
-      install_requires=[
-        'lxml', 'pyopenssl', 'suds>=0.4.1',
-        'pyxmlsec-next'],
-      dependency_links = ['https://github.com/htj/suds-htj/tarball/master#egg=suds-0.4.1'],
+setup(
+    name='sudssigner',
+    version=sudssigner.__version__,
+    packages=['sudssigner'],
+    install_requires=[
+        'lxml', 'pyopenssl', 'suds-jurko>=0.6',
+        'pyxmlsec'],
+    author=u'András Veres-Szentkirályi',
+    author_email='vsza@vsza.hu',
+    maintainer='Ernesto Revilla',
+    maintainer_email='erevilla@tangrambpm.es',
+    description='Sign digitally suds WS requests with X509v3 certificates',
+    license='MIT license',
+    url='https://github.com/dnet/SudsSigner',
+    plataforms=['Linux', 'Windows', 'OSX'],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: POSIX',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: SOAP WS Client',
+        ],
 )
