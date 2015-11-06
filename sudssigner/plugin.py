@@ -74,18 +74,24 @@ class SignerPlugin(MessagePlugin):
     def load_keyfile(self):
         cert = file(self.keyfile, 'rb').read()
         self.cert = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
-        self.privatekey = crypto.load_privatekey(crypto.FILETYPE_PEM, cert)
 
     def handle_keytype(self, keytype):
         if keytype is None:
             return self.detect_keytype()
+        elif keytype == "DSA":
+            return DSA
+        elif keytype == "RSA":
+            return RSA
         elif any(isinstance(keytype, t) for t in (str, unicode)):
             return keytype
         else:
             raise ValueError('keytype must be a string or None')
 
     def detect_keytype(self):
-        algo = self.privatekey.type()
+        cert = file(self.keyfile, 'rb').read()
+        pwd = (self.pwd or self.pwdCallback)
+        privatekey = crypto.load_privatekey(crypto.FILETYPE_PEM, cert, pwd)
+        algo = privatekey.type()
         if algo == crypto.TYPE_DSA:
             return DSA
         if algo == crypto.TYPE_RSA:
